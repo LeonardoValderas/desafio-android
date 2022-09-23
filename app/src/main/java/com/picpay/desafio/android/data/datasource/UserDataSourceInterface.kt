@@ -1,7 +1,7 @@
-package com.picpay.desafio.android.data.datasources
+package com.picpay.desafio.android.data.datasource
 
 import com.picpay.desafio.android.data.network.reponses.ApiResponse
-import com.picpay.desafio.android.models.User
+import com.picpay.desafio.android.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataSourceInterface {

@@ -2,7 +2,7 @@ package com.picpay.desafio.android.data.network.api.services
 
 import com.picpay.desafio.android.data.network.api.Retrofit
 import com.picpay.desafio.android.data.network.reponses.ApiResponse
-import com.picpay.desafio.android.models.User
+import com.picpay.desafio.android.model.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 

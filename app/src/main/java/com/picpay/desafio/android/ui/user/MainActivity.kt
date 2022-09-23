@@ -1,4 +1,4 @@
-package com.picpay.desafio.android.views
+package com.picpay.desafio.android.ui.user
 
 import android.view.View
 import android.widget.ProgressBar
@@ -8,9 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.picpay.desafio.android.R
 import com.picpay.desafio.android.data.network.reponses.StatusResponse
-import com.picpay.desafio.android.views.adapters.UserListAdapter
+import com.picpay.desafio.android.ui.user.adapter.UserListAdapter
 import com.picpay.desafio.android.utils.ComponentUtils
-import com.picpay.desafio.android.viewmodels.UserViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

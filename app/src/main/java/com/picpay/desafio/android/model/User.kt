@@ -1,4 +1,4 @@
-package com.picpay.desafio.android.models
+package com.picpay.desafio.android.model
 
 import com.squareup.moshi.JsonClass
 

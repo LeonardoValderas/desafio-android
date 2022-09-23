@@ -1,8 +1,8 @@
 package com.picpay.desafio.android.di.datasource
 
-import com.picpay.desafio.android.data.datasources.BaseDataSource
-import com.picpay.desafio.android.data.datasources.UserDataSource
-import com.picpay.desafio.android.data.datasources.UserDataSourceInterface
+import com.picpay.desafio.android.data.datasource.BaseDataSource
+import com.picpay.desafio.android.data.datasource.UserDataSource
+import com.picpay.desafio.android.data.datasource.UserDataSourceInterface
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.dsl.module
 

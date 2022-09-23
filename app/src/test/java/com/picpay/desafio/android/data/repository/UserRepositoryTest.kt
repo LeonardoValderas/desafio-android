@@ -1,18 +1,15 @@
-package com.picpay.desafio.android.data.repositories
+package com.picpay.desafio.android.data.repository
 
 import com.picpay.desafio.android.base.BaseTest
-import com.picpay.desafio.android.data.datasources.UserDataSource
-import com.picpay.desafio.android.data.datasources.UserDataSourceInterface
+import com.picpay.desafio.android.data.datasource.UserDataSourceInterface
 import com.picpay.desafio.android.data.network.reponses.ApiResponse
 import com.picpay.desafio.android.data.utils.Resource
-import com.picpay.desafio.android.models.User
-import junit.framework.TestCase
+import com.picpay.desafio.android.model.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mock

@@ -1,4 +1,4 @@
-package com.picpay.desafio.android.viewmodels
+package com.picpay.desafio.android.ui.user
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.picpay.desafio.android.OpenForTesting
 import com.picpay.desafio.android.data.network.reponses.DataResponse
-import com.picpay.desafio.android.data.repositories.UserRepositoryInterface
+import com.picpay.desafio.android.data.repository.UserRepositoryInterface
 import com.picpay.desafio.android.data.utils.Resource
-import com.picpay.desafio.android.models.User
+import com.picpay.desafio.android.model.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

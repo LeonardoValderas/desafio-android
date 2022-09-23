@@ -1,7 +1,7 @@
 package com.picpay.desafio.android.di.repository
 
-import com.picpay.desafio.android.data.repositories.UserRepository
-import com.picpay.desafio.android.data.repositories.UserRepositoryInterface
+import com.picpay.desafio.android.data.repository.UserRepository
+import com.picpay.desafio.android.data.repository.UserRepositoryInterface
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.dsl.module
 

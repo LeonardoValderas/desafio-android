@@ -1,10 +1,10 @@
-package com.picpay.desafio.android.data.repositories
+package com.picpay.desafio.android.data.repository
 
 import com.picpay.desafio.android.OpenForTesting
-import com.picpay.desafio.android.data.datasources.UserDataSourceInterface
+import com.picpay.desafio.android.data.datasource.UserDataSourceInterface
 import com.picpay.desafio.android.data.utils.Resource
 import com.picpay.desafio.android.data.utils.networkBoundResource
-import com.picpay.desafio.android.models.User
+import com.picpay.desafio.android.model.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

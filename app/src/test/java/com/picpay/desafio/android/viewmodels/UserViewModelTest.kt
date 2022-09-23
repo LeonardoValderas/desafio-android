@@ -5,11 +5,10 @@ import androidx.lifecycle.Observer
 import com.picpay.desafio.android.base.BaseTest
 import com.picpay.desafio.android.data.network.reponses.DataResponse
 import com.picpay.desafio.android.data.network.reponses.StatusResponse
-import com.picpay.desafio.android.data.repositories.UserRepository
-import com.picpay.desafio.android.data.repositories.UserRepositoryInterface
+import com.picpay.desafio.android.data.repository.UserRepositoryInterface
 import com.picpay.desafio.android.data.utils.Resource
-import com.picpay.desafio.android.models.User
-import junit.framework.TestCase
+import com.picpay.desafio.android.model.User
+import com.picpay.desafio.android.ui.user.UserViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -18,7 +17,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

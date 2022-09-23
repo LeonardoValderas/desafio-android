@@ -1,4 +1,4 @@
-package com.picpay.desafio.android.data.datasources
+package com.picpay.desafio.android.data.datasource
 
 import com.picpay.desafio.android.data.utils.Cache
 
