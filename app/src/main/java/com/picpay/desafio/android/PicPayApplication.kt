@@ -4,6 +4,7 @@ import android.app.Application
 import com.picpay.desafio.android.di.datasource.dataSourceModule
 import com.picpay.desafio.android.di.network.networkModule
 import com.picpay.desafio.android.di.repository.repositoryModule
+import com.picpay.desafio.android.di.usecase.useCaseModule
 import com.picpay.desafio.android.di.viewmodel.viewModelModule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.android.ext.koin.androidContext
@@ -22,6 +23,7 @@ class PicPayApplication : Application() {
                     networkModule,
                     dataSourceModule,
                     repositoryModule,
+                    useCaseModule,
                     viewModelModule
                 )
             )

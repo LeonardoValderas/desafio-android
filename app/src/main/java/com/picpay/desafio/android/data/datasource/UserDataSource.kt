@@ -1,33 +1,13 @@
 package com.picpay.desafio.android.data.datasource
 
-import com.picpay.desafio.android.data.network.reponses.ApiResponse
-import com.picpay.desafio.android.data.network.api.services.PicPayService
-import com.picpay.desafio.android.model.User
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-@ExperimentalCoroutinesApi
-class UserDataSource constructor(private val service: PicPayService): BaseDataSource(), UserDataSourceInterface {
-    override fun getFromRemote(): Flow<ApiResponse<List<User>>> {
-        return service.getUsers()
-    }
+import com.picpay.desafio.android.core.data.network.adapter.NetworkResponse
+import com.picpay.desafio.android.core.data.network.response.ApiResponseError
+import com.picpay.desafio.android.data.network.response.UserResponse
+import com.picpay.desafio.android.domain.model.User
 
-    override fun getFromLocal(): Flow<List<User>?> {
-        getCache(USER)?.let {
-            return flowOf(it as List<User>)
-        }
-        return flowOf(null)
-    }
-
-    override fun saveLocal(users: List<User>?) {
-        users?.let {
-            setCache(USER, it)
-        } ?: run {
-            removeLocal()
-        }
-    }
-
-    override fun removeLocal() {
-        removeCache(USER)
-    }
+interface UserDataSource {
+    suspend fun getFromRemote(): NetworkResponse<List<UserResponse>, ApiResponseError>
+    fun getFromLocal(): List<User>?
+    fun saveLocal(users: List<User>?)
+    fun removeLocal()
 }

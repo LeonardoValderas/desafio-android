@@ -1,9 +1,9 @@
-package com.picpay.desafio.android.data.repository
+package com.picpay.desafio.android.domain.usercase.user
 
 import com.picpay.desafio.android.core.data.network.response.Resource
 import com.picpay.desafio.android.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
-interface UserRepository {
-    fun getUsers(isRefresh: Boolean): Flow<Resource<List<User>?>>
+interface GetUsersUseCase {
+    operator fun invoke(isRefresh: Boolean): Flow<Resource<List<User>?>>
 }
