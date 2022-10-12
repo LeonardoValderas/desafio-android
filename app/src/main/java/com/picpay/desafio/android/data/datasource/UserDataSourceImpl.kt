@@ -5,10 +5,11 @@ import com.picpay.desafio.android.core.data.network.response.ApiResponseError
 import com.picpay.desafio.android.domain.model.User
 import com.picpay.desafio.android.data.network.service.PicPayService
 import com.picpay.desafio.android.data.network.response.UserResponse
+import com.picpay.desafio.android.data.utils.MemoryCache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-class UserDataSourceImpl constructor(private val service: PicPayService): BaseDataSource(), UserDataSource {
+class UserDataSourceImpl constructor(private val service: PicPayService, cache: MemoryCache): BaseDataSource(cache), UserDataSource {
     override suspend fun getFromRemote(): NetworkResponse<List<UserResponse>, ApiResponseError> {
         return service.getUsers()
     }

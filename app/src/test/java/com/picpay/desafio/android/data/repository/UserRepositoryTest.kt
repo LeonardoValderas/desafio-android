@@ -1,124 +1,103 @@
 package com.picpay.desafio.android.data.repository
 
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.picpay.desafio.android.MockModels
 import com.picpay.desafio.android.base.BaseTest
-import com.picpay.desafio.android.data.datasource.UserDataSourceInterface
-import com.picpay.desafio.android.data.network.reponses.ApiResponse
-import com.picpay.desafio.android.data.utils.Resource
-import com.picpay.desafio.android.model.User
+import com.picpay.desafio.android.core.data.network.adapter.NetworkResponse
+import com.picpay.desafio.android.core.data.network.response.Resource
+import com.picpay.desafio.android.data.datasource.UserDataSource
+import com.picpay.desafio.android.data.network.response.toUser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import okhttp3.ResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import retrofit2.Response
+import java.io.IOException
 
 @ExperimentalCoroutinesApi
-class UserRepositoryTest : BaseTest(){
+class UserRepositoryTest: BaseTest() {
 
     @Mock
-    private lateinit var dataSource: UserDataSourceInterface
+    private lateinit var dataSource: UserDataSource
     private lateinit var repository: UserRepository
 
+    override fun setUp(){
+        super.setUp()
+        repository = UserRepositoryImpl(dataSource)
+    }
 
-    //region USER
+    //region USERS
     @Test
-    fun testUserListWhenIsRefreshSuccessShouldReturnFromRemote() = runBlocking {
-        val list = listOf(
-            User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos", 1001,"@eduardo.santos"
-        ), User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos 2", 1002,"@eduardo.santos2"
-        )
-        )
+    fun getUsers_whenIsRefresh_success_shouldReturnFromRemote() = runBlocking {
+        val list = MockModels.getUserResponseList(2)
 
         Mockito.`when`(dataSource.getFromRemote()).thenReturn(
-            flowOf(
-                ApiResponse.create(Response.success(list))
-            )
+                NetworkResponse.Success(list)
         )
 
-        Mockito.`when`(dataSource.getFromLocal()).thenReturn(
-            flowOf(
-                list
-            )
-        )
-
-        repository = UserRepository(dataSource)
+        repository = UserRepositoryImpl(dataSource)
 
         val result = repository.getUsers(true).toList()
 
-        assertEquals(Resource.Status.LOADING, result[0].status)
-        assertEquals(Resource.Status.SUCCESS, result[1].status)
-        assertEquals(list, result[1].data)
+        verify(dataSource, times(0)).getFromLocal()
+        verify(dataSource, times(1)).getFromRemote()
+        assertEquals(Resource.Loading, result[0])
+        assertTrue(result[1] is Resource.Success)
+        assertEquals(list.map { it.toUser() }, (result[1] as Resource.Success).data)
     }
 
     @Test
-    fun testUserListWhenIsNotRefreshSuccessShouldReturnCache() = runBlocking {
-        val list = listOf(
-            User(
-                "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos", 1001,"@eduardo.santos"
-            ), User(
-                "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos 2", 1002,"@eduardo.santos2"
-            )
-        )
+    fun getUsers_whenIsNotRefresh_success_shouldReturnFromLocal() = runBlocking {
+        val list = MockModels.getUserList(2)
 
         Mockito.`when`(dataSource.getFromLocal()).thenReturn(
-            flowOf(
-                list
-            )
+            list
         )
-
-        repository = UserRepository(dataSource)
 
         val result = repository.getUsers(false).toList()
 
-        assertEquals(Resource.Status.LOADING, result[0].status)
-        assertEquals(Resource.Status.SUCCESS, result[1].status)
-        assertEquals(list, result[1].data)
+        verify(dataSource, times(1)).getFromLocal()
+        verify(dataSource, times(0)).getFromRemote()
+        assertEquals(Resource.Loading, result[0])
+        assertTrue(result[1] is Resource.Success)
+        assertEquals(list, (result[1] as Resource.Success).data)
     }
 
     @Test
-    fun testUserListWhenIsErrorShouldReturnError() = runBlocking {
+    fun getUsers_whenIsNotRefreshAndLocalNull_success_shouldReturnFromRemote() = runBlocking {
+        val list = MockModels.getUserResponseList(2)
+
         Mockito.`when`(dataSource.getFromLocal()).thenReturn(
-            flowOf(
-                null
-            )
+            null
         )
+
         Mockito.`when`(dataSource.getFromRemote()).thenReturn(
-            flowOf(
-                ApiResponse.create(Response.error(404, ResponseBody.create(null, "Error")))
-            )
+            NetworkResponse.Success(list)
         )
-        repository = UserRepository(dataSource)
+
+        val result = repository.getUsers(false).toList()
+
+        verify(dataSource, times(1)).getFromLocal()
+        verify(dataSource, times(1)).getFromRemote()
+        assertEquals(Resource.Loading, result[0])
+        assertTrue(result[1] is Resource.Success)
+        assertEquals(list.map { it.toUser() }, (result[1] as Resource.Success).data)
+    }
+
+    @Test
+    fun getUsers_whenIsNetworkError_shouldReturnSpecificError() = runBlocking {
+        Mockito.`when`(dataSource.getFromRemote()).thenReturn(
+            NetworkResponse.NetworkError(IOException())
+        )
 
         val result = repository.getUsers(true).toList()
 
-        assertEquals(Resource.Status.LOADING, result[0].status)
-        assertEquals(Resource.Status.ERROR, result[1].status)
-    }
-
-    @Test
-    fun testUserListWhenIsFailureShouldReturnFailure() = runBlocking {
-        Mockito.`when`(dataSource.getFromLocal()).thenReturn(
-            flowOf(
-                null
-            )
-        )
-        Mockito.`when`(dataSource.getFromRemote()).thenReturn(
-            flowOf(
-                ApiResponse.create(Throwable())
-            )
-        )
-        repository = UserRepository(dataSource)
-
-        val result = repository.getUsers(false).toList()
-
-        assertEquals(Resource.Status.LOADING, result[0].status)
-        assertEquals(Resource.Status.ERROR, result[1].status)
+        assertEquals(Resource.Loading, result[0])
+        assertTrue(result[1] is Resource.Error)
     }
     //endregion
 }

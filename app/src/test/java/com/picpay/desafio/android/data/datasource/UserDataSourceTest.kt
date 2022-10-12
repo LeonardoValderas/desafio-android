@@ -1,95 +1,114 @@
 package com.picpay.desafio.android.data.datasource
 
+import com.nhaarman.mockitokotlin2.any
+import com.picpay.desafio.android.MockModels.getUserList
+import com.picpay.desafio.android.MockModels.getUserResponseList
 import com.picpay.desafio.android.base.BaseTest
-import com.picpay.desafio.android.data.network.api.services.PicPayService
-import com.picpay.desafio.android.data.network.reponses.ApiErrorResponse
-import com.picpay.desafio.android.data.network.reponses.ApiResponse
-import com.picpay.desafio.android.data.network.reponses.ApiSuccessResponse
-import com.picpay.desafio.android.model.User
+import com.picpay.desafio.android.core.data.network.adapter.NetworkResponse
+import com.picpay.desafio.android.core.data.network.response.ApiResponseError
+import com.picpay.desafio.android.data.network.response.UserResponse
+import com.picpay.desafio.android.data.network.service.PicPayService
+import com.picpay.desafio.android.data.utils.MemoryCache
+import com.picpay.desafio.android.domain.model.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.runBlocking
-import okhttp3.ResponseBody
-import org.junit.Assert.assertEquals
+import org.junit.After
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import retrofit2.Response
+import java.io.IOException
 
 @ExperimentalCoroutinesApi
-class UserDataSourceTest : BaseTest(){
-    companion object {
-        const val IS_ERROR = "Error"
-        const val CODE = 500
-    }
+class UserDataSourceTest: BaseTest() {
     @Mock
     private lateinit var service: PicPayService
+
+    @Mock
+    private lateinit var cache: MemoryCache
     private lateinit var dataSource: UserDataSource
 
-    //region USER
+    override fun setUp() {
+        super.setUp()
+        dataSource = UserDataSourceImpl(service, cache)
+    }
+
+    //region FROM REMOTE SERVICE
     @Test
-    fun testUserListWhenIsSuccessShouldReturnList() = runBlocking {
-        val list = listOf(
-            User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos", 1001,"@eduardo.santos"
-        ), User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos 2", 1002,"@eduardo.santos2"
-        )
-        )
+    fun getUsers_whenIsSuccess_shouldReturnUserResponseList() = runBlocking {
+        val list = getUserResponseList(2)
 
         Mockito.`when`(service.getUsers()).thenReturn(
-            flowOf(
-                ApiResponse.create(
-                    Response.success(
-                        list
-                    )
-                )
-            )
+            NetworkResponse.Success(list)
         )
-        dataSource = UserDataSource(service)
 
-        val result: ApiResponse<List<User>> = dataSource.getFromRemote().single()
-        val body = (result as ApiSuccessResponse).body
-
-        assertEquals(list, body)
+        val result: NetworkResponse<List<UserResponse>, ApiResponseError> =
+            dataSource.getFromRemote()
+        assertTrue(result is NetworkResponse.Success)
+        assertEquals(list, (result as NetworkResponse.Success).body)
     }
 
     @Test
-    fun testUserListWhenIsErrorShouldReturnError() = runBlocking {
-
+    fun getUsers_whenIsNetworkError_shouldReturnSpecificError() = runBlocking {
         Mockito.`when`(service.getUsers()).thenReturn(
-            flowOf(
-                ApiResponse.create(
-                    Response.error(
-                        CODE, ResponseBody.create(null,
-                            IS_ERROR
-                        ))
-                )
-            )
+            NetworkResponse.NetworkError(IOException())
         )
-        dataSource = UserDataSource(service)
-        val result: ApiResponse<List<User>> = dataSource.getFromRemote().single()
-        val error = (result as ApiErrorResponse)
 
-        assertEquals(IS_ERROR, error.errorMessage)
-        assertEquals(CODE,  error.statusCode)
+        val result: NetworkResponse<List<UserResponse>, ApiResponseError> =
+            dataSource.getFromRemote()
+        assertTrue(result is NetworkResponse.NetworkError)
     }
 
     @Test
-    fun testUserListWhenIsFailureShouldReturnFailure() = runBlocking {
+    fun getUsers_whenIsUnknownError_shouldReturnSpecificError() = runBlocking {
         Mockito.`when`(service.getUsers()).thenReturn(
-            flowOf(
-                ApiResponse.create(Throwable(IS_ERROR))
-            )
+            NetworkResponse.UnknownError(Throwable())
         )
-        dataSource = UserDataSource(service)
-        val result: ApiResponse<List<User>> = dataSource.getFromRemote().single()
-        val error = (result as ApiErrorResponse)
 
-        assertEquals(IS_ERROR, error.errorMessage)
-        assertEquals(CODE,  error.statusCode)
+        val result: NetworkResponse<List<UserResponse>, ApiResponseError> =
+            dataSource.getFromRemote()
+        assertTrue(result is NetworkResponse.UnknownError)
     }
-   //endregion
 
+    @Test
+    fun getUsers_whenIsTokenError_shouldReturnSpecificError() = runBlocking {
+        Mockito.`when`(service.getUsers()).thenReturn(
+            NetworkResponse.TokenError(Throwable())
+        )
+
+        val result: NetworkResponse<List<UserResponse>, ApiResponseError> =
+            dataSource.getFromRemote()
+        assertTrue(result is NetworkResponse.TokenError)
+    }
+    //endregion
+
+    //region FROM LOCAL
+    @Test
+    fun getUsers_whenIsSuccess_shouldReturnUserList() = runBlocking {
+        val list = getUserList(2)
+
+        Mockito.`when`(cache.get(any())).thenReturn(
+            list
+        )
+
+        val result: List<User>? = dataSource.getFromLocal()
+        assertEquals(list, result)
+    }
+
+    @Test
+    fun getUsers_whenIsEmpty_shouldReturnNull() = runBlocking {
+        Mockito.`when`(cache.get(any())).thenReturn(
+            null
+        )
+
+        val result: List<User>? = dataSource.getFromLocal()
+        assertNull(result)
+    }
+    //endregion
+
+
+    @After
+    fun tearDown() {
+
+    }
 }

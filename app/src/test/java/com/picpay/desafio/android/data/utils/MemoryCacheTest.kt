@@ -1,13 +1,12 @@
 package com.picpay.desafio.android.data.utils
 
 import com.picpay.desafio.android.base.BaseTest
-import junit.framework.TestCase
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class CacheTest : BaseTest() {
-    lateinit var cache: CacheInterface
+class MemoryCacheTest : BaseTest() {
+    lateinit var cache: MemoryCache
 
     companion object {
         const val KEY_1 = "key_string_1"
@@ -18,23 +17,23 @@ class CacheTest : BaseTest() {
 
     override fun setUp() {
         super.setUp()
-        cache = Cache()
+        cache = MemoryCache()
     }
 
     @Test
-    fun testCacheWhenInitShouldBeZero() {
+    fun cacheSize_whenInit_shouldBeZero() {
         assertTrue(cache.size == 0)
     }
 
     @Test
-    fun testCacheWhenSetItemShouldReturnItemAdded() {
+    fun cacheSet_whenSetItem_shouldReturnItemAdded() {
         cache.set(KEY_1, ITEM_1)
         assertTrue(cache.size == 1)
         assertTrue(cache.get(KEY_1)  ==  ITEM_1)
     }
 
     @Test
-    fun testCacheWhenRemoveItemShouldDeleteItem() {
+    fun cacheRemove_whenRemoveItem_shouldDeleteItem() {
         cache.set(KEY_1, ITEM_1)
         cache.set(KEY_2, ITEM_2)
         assertTrue(cache.size == 2)
@@ -45,7 +44,7 @@ class CacheTest : BaseTest() {
         assertTrue(cache.get(KEY_2) == ITEM_2)
     }
     @Test
-    fun testCacheWhenClearShouldBeEmpty(){
+    fun cacheClear_shouldBeEmpty(){
         cache.set(KEY_1, ITEM_1)
         cache.set(KEY_2, ITEM_2)
         assertTrue(cache.size == 2)

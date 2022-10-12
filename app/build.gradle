@@ -8,11 +8,11 @@ allOpen {
     annotation 'com.picpay.desafio.android.utils.OpenForTesting'
 }
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.picpay.desafio.android"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -56,37 +56,38 @@ dependencies {
 
     implementation "com.google.android.material:material:$materialVersion"
 
+    //KOIN
     implementation "org.koin:koin-core:$koinVersion"
     implementation "org.koin:koin-android:$koinVersion"
     implementation "org.koin:koin-androidx-viewmodel:$koinVersion"
 
+    //DAGGER
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
+    //LIFECYCLE
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
 
+    //COROUTINE
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
-
-    implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
-
+    //GSON
     implementation 'com.google.code.gson:gson:2.8.6'
 
+    //RETROFIT
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
     implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
     implementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
+
 
     // MOSHI
-
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation("com.squareup.moshi:moshi-kotlin:$moshiVersion")
     annotationProcessor "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
@@ -100,10 +101,15 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
     testImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesTestVersion"
     implementation "org.koin:koin-test:$koinVersion"
 
+    androidTestImplementation project(path: ':app')
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4-alpha07'
     androidTestImplementation "androidx.test:runner:$testRunnerVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.0-alpha07"
+    androidTestImplementation "org.mockito:mockito-android:4.8.0"
     androidTestImplementation "androidx.test:core-ktx:$coreKtxTestVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
+    androidTestImplementation "io.insert-koin:koin-test:$testAndroidKoinVersion"
 }

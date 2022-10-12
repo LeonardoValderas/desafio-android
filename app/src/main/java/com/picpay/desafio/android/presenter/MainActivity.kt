@@ -3,18 +3,22 @@ package com.picpay.desafio.android.presenter
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.picpay.desafio.android.R
+import com.picpay.desafio.android.core.data.network.response.DataResponse
 import com.picpay.desafio.android.core.data.network.response.StatusResponse
 import com.picpay.desafio.android.databinding.ActivityMainBinding
+import com.picpay.desafio.android.domain.model.User
 import com.picpay.desafio.android.presenter.adapter.UserListAdapter
 import com.picpay.desafio.android.utils.ComponentUtils
+import com.picpay.desafio.android.utils.OpenForTesting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
-class MainActivity : AppCompatActivity() {
+class   MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel: UserViewModel by viewModel()
     private lateinit var adapter: UserListAdapter
@@ -32,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         initViewModelObserver()
     }
 
-    private fun initRecyclerView(){
+    private fun initRecyclerView() {
         adapter = UserListAdapter()
         with(binding) {
             recyclerView.adapter = adapter
@@ -40,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initViewModelObserver(){
+    private fun initViewModelObserver() {
         with(viewModel) {
             users.observe(this@MainActivity, Observer { resource ->
                 when (resource.status) {
@@ -68,17 +72,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError(){
-        ComponentUtils.showToast(this@MainActivity, getString(R.string.error))
+    private fun showError() {
         progressBarVisibilityHandler(false)
         recyclerViewVisibilityHandler(false)
+        ComponentUtils.showToast(this@MainActivity, getString(R.string.error))
     }
 
-    private fun progressBarVisibilityHandler(show: Boolean){
-        binding.userListProgressBar.visibility = if (show) View.VISIBLE else  View.GONE
+    private fun progressBarVisibilityHandler(show: Boolean) {
+        binding.userListProgressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    private fun recyclerViewVisibilityHandler(show: Boolean){
-        binding.recyclerView.visibility = if (show) View.VISIBLE else  View.GONE
+    private fun recyclerViewVisibilityHandler(show: Boolean) {
+        binding.recyclerView.visibility = if (show) View.VISIBLE else View.GONE
     }
 }

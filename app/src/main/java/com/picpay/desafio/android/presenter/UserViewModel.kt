@@ -21,10 +21,6 @@ class UserViewModel(private val getUsersUseCase: GetUsersUseCase): ViewModel() {
     val users: LiveData<DataResponse<List<User>>>
         get() = _users
 
-//    init {
-//        getUsers(false)
-//    }
-
     final fun getUsers(isRefresh: Boolean) {
         try {
             getUsersUseCase.invoke(isRefresh)

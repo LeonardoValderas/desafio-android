@@ -1,37 +1,29 @@
 package com.picpay.desafio.android.viewmodels
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.picpay.desafio.android.base.BaseTest
-import com.picpay.desafio.android.data.network.reponses.DataResponse
-import com.picpay.desafio.android.data.network.reponses.StatusResponse
-import com.picpay.desafio.android.data.repository.UserRepositoryInterface
-import com.picpay.desafio.android.data.utils.Resource
-import com.picpay.desafio.android.model.User
-import com.picpay.desafio.android.ui.user.UserViewModel
-import kotlinx.coroutines.Dispatchers
+import com.picpay.desafio.android.MockModels
+import com.picpay.desafio.android.MockitoProvideTest
+import com.picpay.desafio.android.core.data.network.response.DataResponse
+import com.picpay.desafio.android.core.data.network.response.Resource
+import com.picpay.desafio.android.core.data.network.response.StatusResponse
+import com.picpay.desafio.android.domain.model.User
+import com.picpay.desafio.android.domain.usercase.user.GetUsersUseCase
+import com.picpay.desafio.android.presenter.UserViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
+import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
-import org.junit.Rule
+import org.junit.Before
 import org.junit.Test
 import org.mockito.*
 
 @ExperimentalCoroutinesApi
-class UserViewModelTest : BaseTest(){
+class UserViewModelTest : MockitoProvideTest() {
 
-    @Mock
-    private lateinit var repository: UserRepositoryInterface
     lateinit var viewModel: UserViewModel
 
-    @Rule
-    @JvmField
-    val instantExecutorRule = InstantTaskExecutorRule()
+    @Mock
+    private lateinit var getUsersUseCase: GetUsersUseCase
 
     @Mock
     private lateinit var userObserver: Observer<DataResponse<List<User>>>
@@ -39,35 +31,48 @@ class UserViewModelTest : BaseTest(){
     @Captor
     private lateinit var userArgumentCaptor: ArgumentCaptor<DataResponse<List<User>>>
 
-    private val testDispatcher = TestCoroutineDispatcher()
-
-    override fun setUp() {
-        super.setUp()
-        Dispatchers.setMain(testDispatcher)
+    @Before
+    fun setUp() {
+        viewModel = UserViewModel(getUsersUseCase).also {
+            it.users.apply {
+                observeForever(userObserver)
+            }
+        }
     }
 
     //region USER LIST
     @Test
-    fun testUsersWhenIsSuccessShouldReturnList() = testDispatcher.runBlockingTest {
-        val list = listOf(User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos", 1001,"@eduardo.santos"
-        ), User(
-            "https://randomuser.me/api/portraits/men/9.jpg","Eduardo Santos 2", 1002,"@eduardo.santos2"
-        ))
-
-        Mockito.`when`(repository.getUsers(false)).thenReturn(
+    fun getUsers_whenStart_shouldReturnLoading() = scope.runTest {
+        // given
+        Mockito.`when`(getUsersUseCase.invoke(true)).thenReturn(
             flowOf(
-                Resource.success(
+                Resource.NotInitialized
+            )
+        )
+        // when
+        viewModel.getUsers(true)
+
+        Mockito.verify(userObserver, Mockito.times(1)).onChanged(
+            userArgumentCaptor.capture()
+        )
+        // then
+        val values = userArgumentCaptor.allValues
+        assertEquals(1, values.size)
+        assertEquals(StatusResponse.LOADING, values.first().status)
+    }
+
+    @Test
+    fun getUsers_whenIsSuccess_shouldReturnList() = scope.runTest {
+        val list = MockModels.getUserList(2)
+        Mockito.`when`(getUsersUseCase.invoke(true)).thenReturn(
+            flowOf(
+                Resource.Success(
                     list
                 )
             )
         )
 
-        viewModel = UserViewModel(repository)
-
-        viewModel.users.apply {
-            observeForever(userObserver)
-        }
+        viewModel.getUsers(true)
 
         Mockito.verify(userObserver, Mockito.times(1)).onChanged(
             userArgumentCaptor.capture()
@@ -80,17 +85,14 @@ class UserViewModelTest : BaseTest(){
     }
 
     @Test
-    fun testUserListWhenIsErrorShouldReturnFailure() = testDispatcher.runBlockingTest {
-        Mockito.`when`(repository.getUsers(false)).thenReturn(
+    fun getUsers_whenIsError_ShouldReturnFailure() = scope.runTest {
+        Mockito.`when`(getUsersUseCase.invoke(true)).thenReturn(
             flowOf(
-                Resource.error("Error", null, null)
+                Resource.Error(Exception())
             )
         )
-        viewModel = UserViewModel(repository)
 
-        viewModel.users.apply {
-            observeForever(userObserver)
-        }
+        viewModel.getUsers(true)
 
         Mockito.verify(userObserver, Mockito.times(1)).onChanged(
             userArgumentCaptor.capture()
@@ -101,11 +103,23 @@ class UserViewModelTest : BaseTest(){
         assertEquals(StatusResponse.FAILURE, values.first().status)
     }
 
-    //endregion
+    @Test
+    fun getUsers_whenStartLoading_shouldReturnLoading() = scope.runTest {
+        Mockito.`when`(getUsersUseCase.invoke(true)).thenReturn(
+            flowOf(
+                Resource.Loading
+            )
+        )
 
-    @After
-    fun teardown() {
-        Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
+        viewModel.getUsers(true)
+
+        Mockito.verify(userObserver, Mockito.times(1)).onChanged(
+            userArgumentCaptor.capture()
+        )
+
+        val values = userArgumentCaptor.allValues
+        assertEquals(1, values.size)
+        assertEquals(StatusResponse.LOADING, values.first().status)
     }
+    //endregion
 }

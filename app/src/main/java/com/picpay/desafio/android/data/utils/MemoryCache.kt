@@ -1,5 +1,8 @@
 package com.picpay.desafio.android.data.utils
 
+import com.picpay.desafio.android.utils.OpenForTesting
+
+@OpenForTesting
 class MemoryCache: MemoryCacheInterface {
     private val cache = HashMap<Any, Any>()
 
